@@ -1,0 +1,25 @@
+{
+  "name": "url2png-express",
+  "version": "1.0.0",
+  "description": "A simple express server to return the URL screenshot captured by chromium",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hkbu-kennycheng/url2png-express.git"
+  },
+  "author": "Kenny Cheng",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hkbu-kennycheng/url2png-express/issues"
+  },
+  "homepage": "https://github.com/hkbu-kennycheng/url2png-express#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mkdirp": "^3.0.1",
+    "puppeteer-core": "^20.8.2"
+  }
+}
