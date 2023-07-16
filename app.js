@@ -6,14 +6,14 @@ const path = require('path');
 const { mkdirp } = require('mkdirp');
 
 app.get("*", async (req, res) => {
-    let url = req.path.substring(1) || 'www.comp.hkbu.edu.hk'
+    let url = req.path.substring(1) || 'ddg.gg'
     let parts = url.split('/');
     let width = 1280;
     let height = 720;
 
     const prefix = '/tmp/url2png/';
     const dir = prefix + path.dirname(url);
-    const filename = `${prefix}${url}.png`;
+    const filename = prefix + `${url}.png`;
     if (dir) {
         mkdirp(dir);
     }
