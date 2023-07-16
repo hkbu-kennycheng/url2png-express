@@ -6,13 +6,14 @@ const path = require('path');
 const { mkdirp } = require('mkdirp');
 
 app.get("*", async (req, res) => {
-    let url = req.path.substring(1);
+    let url = req.path.substring(1) || 'www.comp.hkbu.edu.hk'
     let parts = url.split('/');
     let width = 1280;
     let height = 720;
 
-    const dir = path.dirname(`/tmp/${url}`);
-    const filename = `/tmp/${url}.png`;
+    const prefix = '/tmp/url2png/';
+    const dir = prefix + path.dirname(url);
+    const filename = `${prefix}${url}.png`;
     if (dir) {
         mkdirp(dir);
     }
@@ -51,8 +52,7 @@ app.get("*", async (req, res) => {
 
         return res.sendFile(filename);
     } catch(ex) {
-        console.log(ex);
-        return res.sendStatus(500);
+        return res.sendStatus(404);
     }
 });
 
