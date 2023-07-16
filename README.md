@@ -33,3 +33,5 @@ You could also specify the viewport size by passing in the `width` path paramete
 ```html
 <img src="http://localhost:3000/<width>/www.google.com" />
 ```
+
+Or you could also use our web service at [https://url2png.hkbu.app/](https://url2png.hkbu.app/) to generate the screenshot.
