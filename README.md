@@ -16,7 +16,7 @@ npm start
 
 ## Usage
 
-Directly passing in the URL as the path parameter without the protocol prefix in `src` attribute of an ``<img>` tag. All URL is assumed to be HTTPS.
+Directly passing in the URL as the path parameter without the protocol prefix in `src` attribute of an `<img>` tag. All URL is assumed to be HTTPS.
 
 ```html
 <img src="http://localhost:3000/www.google.com" />
