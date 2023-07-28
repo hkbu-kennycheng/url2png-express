@@ -1,61 +1,78 @@
-const express = require("express");
-const app = express();
-const puppeteer = require('puppeteer-core')
-const fs = require('fs');
-const path = require('path');
-const { mkdirp } = require('mkdirp');
+const express = require('express')
+const app = express()
+const fs = require('fs')
+const path = require('path')
+const { mkdirp } = require('mkdirp')
+const { spawn } = require('child_process')
 
-app.get("*", async (req, res) => {
-    let url = req.path.substring(1) || 'ddg.gg'
-    let parts = url.split('/');
-    let width = 1280;
-    let height = 720;
+async function runPuppeteer (data) {
+  const jsonData = JSON.stringify(data)
+  const b64Data = Buffer.from(jsonData).toString('base64')
+  //  let stdoutData = ''
+  return await new Promise((resolve) => {
+    const p = spawn('node', [
+      path.resolve(__dirname, 'puppeteerWorker.js'),
+      `--input-data${b64Data}`,
+      '--tagprocess'
+    ], { shell: false })
+    //    p.stdout.on('data', (data) => {
+    //      stdoutData += data
+    //    })
+    p.stderr.on('data', (data) => {
+      console.error(`NodeERR: ${data}`)
+    })
+    p.on('close', async (code) => {
+    })
+    p.on('exit', function () {
+      p.kill()
+      resolve()
+    })
+  })
+}
 
-    const prefix = '/tmp/url2png/';
-    const dir = prefix + path.dirname(url);
-    const filename = prefix + `${url}.png`;
-    if (dir) {
-        mkdirp(dir);
-    }
+app.get('*', async (req, res) => {
+  let url = req.path.substring(1) || 'ddg.gg'
+  const parts = url.split('/')
+  let width = 1280
+  let height = 720
 
-    if (fs.existsSync(filename)) {
-        return res.sendFile(filename);
-    }
+  const prefix = '/tmp/url2png/'
+  const dir = prefix + path.dirname(url)
+  const filename = prefix + `${url}.png`
+  if (dir) {
+    mkdirp(dir)
+  }
 
+  if (fs.existsSync(filename)) {
+    return res.sendFile(filename)
+  }
+
+  if (parts[0] && parseInt(parts[0])) {
+    width = parseInt(parts[0])
+    parts.splice(0, 1)
+    url = parts.join('/')
     if (parts[0] && parseInt(parts[0])) {
-        width = parseInt(parts[0]);
-        parts.splice(0, 1);
-        url = parts.join('/');
-        if (parts[0] && parseInt(parts[0])) {
-            height = parseInt(parts[0]);
-            parts.splice(0, 1);
-            url = parts.join('/');
-        } else {
-            height = Math.ceil(width / 16 * 9);
-        }
+      height = parseInt(parts[0])
+      parts.splice(0, 1)
+      url = parts.join('/')
+    } else {
+      height = Math.ceil(width / 16 * 9)
     }
+  }
 
-    try {
-        const browser = await puppeteer.launch({
-            executablePath:'/usr/bin/chromium', headless:'new', args:['--no-sandbox']
-        });
+  await runPuppeteer({
+    url,
+    width,
+    height,
+    filename
+  })
 
-        const page = await browser.newPage();
-        await page.setViewport({
-            width: width,
-            height: height,
-            deviceScale: 1
-        });
-        await page.goto(`https://${url}`, {waitUntil:'networkidle0'});
-        await page.screenshot({path: filename});
-        await browser.close();
-
-        return res.sendFile(filename);
-    } catch(ex) {
-        return res.sendStatus(404);
-    }
-});
+  if (fs.existsSync(filename)) {
+    return res.sendFile(filename)
+  }
+  return res.sendStatus(404)
+})
 
 app.listen(3000, () => {
-    console.log("Listen on the port 3000...");
-});
+  console.log('Listen on the port 3000...')
+})
